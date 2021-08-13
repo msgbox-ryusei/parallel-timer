@@ -1,21 +1,37 @@
 <template>
-<v-card>
-  <div>
-    {{ getTimeText(remainTime) }}
-    <v-btn>test</v-btn>
-    <input type="button" value="start" @click="startAction" v-if="!runningTimer && remainTime !== 0"/>
-    <input type="button" value="stop" @click="stopAction" v-if="runningTimer"/>
-    <input type="button" value="reset" @click="resetAction" v-if="remainTime === 0">
+  <div class="timer-flame">
+    <div :class="{'timer-text': true, 'completed': remainTime === 0}">
+      {{ getTimeText(remainTime) }}
+    </div>
+    <div class="timer-btn">
+      <input
+        type="button"
+        value="Start"
+        @click="startAction"
+        v-if="!runningTimer && remainTime !== 0"
+      />
+      <input
+        type="button"
+        value="Stop"
+        @click="stopAction"
+        v-if="runningTimer"
+      />
+      <input
+        type="button"
+        value="Reset"
+        @click="resetAction"
+        v-if="remainTime === 0"
+      />
+    </div>
   </div>
-</v-card>
 </template>
 <script>
 export default {
   props: {
     time: {
       required: true,
-      type: Number
-    }
+      type: Number,
+    },
   },
   data() {
     return {
@@ -23,7 +39,7 @@ export default {
       elapsedTime: 0, // 経過時間
       timeToAdd: 0,
       timerId: null,
-      runningTimer: false
+      runningTimer: false,
     };
   },
   computed: {
@@ -40,14 +56,14 @@ export default {
       const textSeconds = ("0" + seconds).slice(-2);
       const milliSeconds = time % 1000;
       const textMilliSeconds = ("00" + milliSeconds).slice(-3);
-      return `${textMinutes}:${textSeconds}:${textMilliSeconds}`
+      return `${textMinutes}:${textSeconds}:${textMilliSeconds}`;
     },
     countUp() {
       this.timerId = setTimeout(() => {
         this.elapsedTime = Date.now() - this.startTime + this.timeToAdd;
         if (this.time - this.elapsedTime > 0) {
           this.countUp();
-        }else {
+        } else {
           this.stopAction();
         }
       }, 10);
@@ -69,3 +85,27 @@ export default {
   },
 };
 </script>
+<style>
+.timer-flame {
+  width: 150px;
+  height: 100px;
+  padding: 10px;
+  border: 4px solid gray;
+  border-radius: 15px;
+  background-color: #bffcfc;
+}
+.timer-text {
+  text-align: center;
+  font-size: 20px;
+}
+.completed {
+  color: red;
+}
+.timer-btn {
+  text-align: center;
+}
+.timer-btn input {
+  width: 70px;
+  height: 25px;
+}
+</style>
