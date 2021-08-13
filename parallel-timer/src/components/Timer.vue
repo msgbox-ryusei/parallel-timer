@@ -1,57 +1,64 @@
 <template>
+<v-card>
   <div>
-    {{ `${elapsedMinutes}:${elapsedSeconds}.${elapsedMilliSeconds}` }}
-    {{ remainTime }}
-    <input type="button" value="start" @click="startAction" />
-    <input type="button" value="stop" @click="stopAction" />
+    {{ getTimeText(remainTime) }}
+    <v-btn>test</v-btn>
+    <input type="button" value="start" @click="startAction" v-if="!runningTimer && remainTime !== 0"/>
+    <input type="button" value="stop" @click="stopAction" v-if="runningTimer"/>
+    <input type="button" value="reset" @click="resetAction" v-if="remainTime === 0">
   </div>
+</v-card>
 </template>
 <script>
 export default {
+  props: {
+    time: {
+      required: true,
+      type: Number
+    }
+  },
   data() {
     return {
-      time: 3000,
       startTime: null,
       elapsedTime: 0, // 経過時間
       timeToAdd: 0,
       timerId: null,
+      runningTimer: false
     };
   },
   computed: {
-    // 経過時間(分)
-    elapsedMinutes() {
-      const value = Math.floor(this.elapsedTime / 60000);
-      return ("0" + value).slice(-2);
-    },
-    // 経過時間(秒)
-    elapsedSeconds() {
-      const value = Math.floor((this.elapsedTime % 60000) / 1000);
-      return ("0" + value).slice(-2);
-    },
-    // 経過時間(ﾐﾘ秒)
-    elapsedMilliSeconds() {
-      const value = this.elapsedTime % 1000;
-      return ("00" + value).slice(-3);
-    },
     remainTime() {
       const value = this.time - this.elapsedTime;
       return value > 0 ? value : 0;
     },
   },
   methods: {
+    getTimeText(time) {
+      const minutes = Math.floor(time / 60000);
+      const textMinutes = ("0" + minutes).slice(-2);
+      const seconds = Math.floor((time % 60000) / 1000);
+      const textSeconds = ("0" + seconds).slice(-2);
+      const milliSeconds = time % 1000;
+      const textMilliSeconds = ("00" + milliSeconds).slice(-3);
+      return `${textMinutes}:${textSeconds}:${textMilliSeconds}`
+    },
     countUp() {
       this.timerId = setTimeout(() => {
         this.elapsedTime = Date.now() - this.startTime + this.timeToAdd;
         if (this.time - this.elapsedTime > 0) {
           this.countUp();
+        }else {
+          this.stopAction();
         }
       }, 10);
     },
     startAction() {
+      this.runningTimer = true;
       this.startTime = Date.now();
       this.countUp();
     },
     stopAction() {
+      this.runningTimer = false;
       clearTimeout(this.timerId);
       this.timeToAdd += Date.now() - this.startTime;
     },
