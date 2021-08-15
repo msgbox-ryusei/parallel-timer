@@ -1,6 +1,9 @@
 <template>
   <div class="timer-flame">
-    <div :class="{'timer-text': true, 'completed': remainTime === 0}">
+    <div class="close-button" @click="closeAction">
+      <span>×</span>
+    </div>
+    <div :class="{ 'timer-text': true, completed: remainTime === 0 }">
       {{ getTimeText(remainTime) }}
     </div>
     <div class="timer-btn">
@@ -20,7 +23,7 @@
         type="button"
         value="Reset"
         @click="resetAction"
-        v-if="remainTime === 0"
+        v-if="!runningTimer"
       />
     </div>
   </div>
@@ -40,6 +43,7 @@ export default {
       timeToAdd: 0,
       timerId: null,
       runningTimer: false,
+      alerm: new Audio("./alerm.mp3"),
     };
   },
   computed: {
@@ -48,7 +52,20 @@ export default {
       return value > 0 ? value : 0;
     },
   },
+  watch: {
+    remainTime(newVal, preVal) {
+      if (newVal !== preVal && newVal === 0) {
+        this.alerm.play();
+      }
+      if (newVal !== 0 && preVal === 0) {
+        this.alerm.stop();
+      }
+    },
+  },
   methods: {
+    closeAction() {
+      this.$emit("close-action");
+    },
     getTimeText(time) {
       const minutes = Math.floor(time / 60000);
       const textMinutes = ("0" + minutes).slice(-2);
@@ -69,14 +86,18 @@ export default {
       }, 10);
     },
     startAction() {
-      this.runningTimer = true;
-      this.startTime = Date.now();
-      this.countUp();
+      if (!this.runningTimer) {
+        this.runningTimer = true;
+        this.startTime = Date.now();
+        this.countUp();
+      }
     },
     stopAction() {
-      this.runningTimer = false;
-      clearTimeout(this.timerId);
-      this.timeToAdd += Date.now() - this.startTime;
+      if (this.runningTimer) {
+        this.runningTimer = false;
+        clearTimeout(this.timerId);
+        this.timeToAdd += Date.now() - this.startTime;
+      }
     },
     resetAction() {
       this.elapsedTime = 0;
@@ -107,5 +128,10 @@ export default {
 .timer-btn input {
   width: 70px;
   height: 25px;
+}
+.close-button {
+  cursor: pointer;
+  padding-left: 130px;
+  position: absolute;
 }
 </style>
