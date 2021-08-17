@@ -1,32 +1,27 @@
 <template>
-  <div class="timer-flame">
-    <div class="close-button" @click="closeAction">
-      <span>×</span>
+  <v-card max-width="250">
+    <div class="close-button">
+      <span class="ma-1 cursor-button" @click="closeAction">×</span>
     </div>
-    <div :class="{ 'timer-text': true, completed: remainTime === 0 }">
-      {{ getTimeText(remainTime) }}
-    </div>
-    <div class="timer-btn">
-      <input
-        type="button"
-        value="Start"
-        @click="startAction"
-        v-if="!runningTimer && remainTime !== 0"
-      />
-      <input
-        type="button"
-        value="Stop"
-        @click="stopAction"
-        v-if="runningTimer"
-      />
-      <input
-        type="button"
-        value="Reset"
-        @click="resetAction"
-        v-if="!runningTimer"
-      />
-    </div>
-  </div>
+    <v-card-text class="align-center">
+      <div
+        :class="{
+          'timer-text': true,
+          'mb-3': true,
+          completed: remainTime === 0,
+        }"
+      >
+        {{ getTimeText(remainTime) }}
+      </div>
+      <div class="timer-btn">
+        <v-btn @click="startAction" v-if="!runningTimer && remainTime !== 0" class="mx-1">
+          Start
+        </v-btn>
+        <v-btn @click="stopAction" v-if="runningTimer" class="mx-1"> Stop </v-btn>
+        <v-btn @click="resetAction" v-if="!runningTimer" class="mx-1"> Reset </v-btn>
+      </div>
+    </v-card-text>
+  </v-card>
 </template>
 <script>
 export default {
@@ -55,10 +50,10 @@ export default {
   watch: {
     remainTime(newVal, preVal) {
       if (newVal !== preVal && newVal === 0) {
-        this.alerm.play();
+        // this.alerm.play();
       }
       if (newVal !== 0 && preVal === 0) {
-        this.alerm.stop();
+        // this.alerm.stop();
       }
     },
   },
@@ -67,13 +62,15 @@ export default {
       this.$emit("close-action");
     },
     getTimeText(time) {
-      const minutes = Math.floor(time / 60000);
+      const secondsTime = time / 1000;
+      const hours = Math.floor(secondsTime / 3600);
+      const minutes = Math.floor((secondsTime % 3600) / 60);
       const textMinutes = ("0" + minutes).slice(-2);
-      const seconds = Math.floor((time % 60000) / 1000);
+      const seconds = Math.floor(secondsTime % 60);
       const textSeconds = ("0" + seconds).slice(-2);
-      const milliSeconds = time % 1000;
-      const textMilliSeconds = ("00" + milliSeconds).slice(-3);
-      return `${textMinutes}:${textSeconds}:${textMilliSeconds}`;
+      // const milliSeconds = time % 1000;
+      // const textMilliSeconds = ("00" + milliSeconds).slice(-3);
+      return `${hours}:${textMinutes}:${textSeconds}`;
     },
     countUp() {
       this.timerId = setTimeout(() => {
@@ -107,31 +104,21 @@ export default {
 };
 </script>
 <style>
-.timer-flame {
-  width: 150px;
-  height: 100px;
-  padding: 10px;
-  border: 4px solid gray;
-  border-radius: 15px;
-  background-color: #bffcfc;
-}
 .timer-text {
   text-align: center;
-  font-size: 20px;
+  font-size: 25px;
 }
 .completed {
   color: red;
 }
-.timer-btn {
+.align-center {
   text-align: center;
 }
-.timer-btn input {
-  width: 70px;
-  height: 25px;
-}
 .close-button {
+  text-align: right;
+  font-size: 18px;
+}
+.cursor-button {
   cursor: pointer;
-  padding-left: 130px;
-  position: absolute;
 }
 </style>
