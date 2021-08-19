@@ -1,17 +1,29 @@
 <template>
   <v-app>
-    <v-main>
-      <div class="contant">
-        <v-dialog v-model="dialog" width="500">
+    <v-main class="back-ground">
+      <div class="side-menu">
+        <ul class="menu">
+          <li @click="allStart"><a>All Start</a></li>
+          <v-divider></v-divider>
+          <li @click="allStop"><a>All Stop</a></li>
+        </ul>
+      </div>
+      <div class="contant" id="top">
+        <v-dialog v-model="addDialog" width="500" color>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="blue lighten-2" dark v-bind="attrs" v-on="on" class="mx-3 mt-2">
+            <v-btn
+              color="green lighten-1"
+              dark
+              v-bind="attrs"
+              v-on="on"
+              class="mx-3 mt-2"
+            >
               Add Timer
             </v-btn>
           </template>
 
           <v-card>
-            <v-card-title class="text-h5 grey lighten-2"> Add Timer </v-card-title>
-
+            <v-card-title class="text-h5 orange lighten-2"> Add Timer </v-card-title>
             <v-card-text>
               <v-container>
                 <v-row>
@@ -37,7 +49,21 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="addTimer"> OK </v-btn>
-              <v-btn color="primary" text @click="dialog = false"> Cancel </v-btn>
+              <v-btn color="primary" text @click="addDialog = false"> Cancel </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="deleteDialog" width="500">
+          <v-card>
+            <v-card-title> </v-card-title>
+            <v-card-text> タイマーを削除してもよろしいですか。 </v-card-text>
+
+            <v-divider></v-divider>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="deleteTimer"> OK </v-btn>
+              <v-btn color="primary" text @click="deleteDialog = false"> Cancel </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -46,6 +72,8 @@
           :key="timer.id"
           class="ma-3"
           :time="timer.time"
+          ref="timers"
+          @close-action="openDeleteDialog(timer.id)"
         ></Timer>
       </div>
     </v-main>
@@ -70,7 +98,9 @@ export default {
     inputHour: "",
     inputMinutes: "",
     inputSecond: "",
-    dialog: false,
+    addDialog: false,
+    deleteDialog: false,
+    deleteId: 0,
   }),
   methods: {
     addTimer() {
@@ -84,7 +114,6 @@ export default {
       if (this.inputSecond) {
         sum = sum + this.inputSecond * 1000;
       }
-      console.log(sum);
       if (sum !== 0) {
         const timer = {
           time: sum,
@@ -92,14 +121,54 @@ export default {
         };
         this.timers.unshift(timer);
         this.timerIdSequence++;
-        this.dialog = false;
+        this.addDialog = false;
       }
+    },
+    openDeleteDialog(timerId) {
+      this.deleteId = timerId;
+      this.deleteDialog = true;
+    },
+    deleteTimer() {
+      const newTimers = this.timers.filter((v) => v.id !== this.deleteId);
+      this.timers = newTimers;
+      this.deleteDialog = false;
+      this.deleteId = 0;
+    },
+    allStart() {
+      const startActions = this.$refs.timers.map((ref) => ref.startAction);
+      Promise.all(startActions.map((v) => v()));
+    },
+    allStop() {
+      const stopActions = this.$refs.timers.map((ref) => ref.stopAction);
+      Promise.all(stopActions.map((v) => v()));
     },
   },
 };
 </script>
 <style>
+.back-ground {
+  background-color: #fff9c4;
+}
 .content {
   margin: 0 auto;
+}
+.side-menu {
+  position: fixed;
+  top: 10vh;
+  right: 0;
+  z-index: 1;
+  font-size: 0;
+}
+
+.side-menu li a {
+  -webkit-writing-mode: vertical-rl;
+  -ms-writing-mode: tb-rl;
+  writing-mode: vertical-rl;
+  font-size: 1rem;
+  padding: 25px 20px;
+  color: #9f886e;
+  background-color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  -webkit-tap-highlight-color: #9f886e;
 }
 </style>

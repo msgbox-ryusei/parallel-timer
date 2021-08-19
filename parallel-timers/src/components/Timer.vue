@@ -116,7 +116,7 @@ export default {
 }
 .close-button {
   text-align: right;
-  font-size: 18px;
+  font-size: 20px;
 }
 .cursor-button {
   cursor: pointer;
