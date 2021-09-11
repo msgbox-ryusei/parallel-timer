@@ -27,6 +27,15 @@
             <v-card-text>
               <v-container>
                 <v-row>
+                  <v-col cols="8">
+                    <v-text-field
+                      type="text"
+                      label="タイトル"
+                      v-model="inputTitle"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
                   <v-col cols="4"
                     ><InputNumber v-model="inputHour" label="時間" :max="99"></InputNumber
                   ></v-col>
@@ -72,6 +81,7 @@
           :key="timer.id"
           class="ma-3"
           :time="timer.time"
+          :title="timer.title"
           ref="timers"
           @close-action="openDeleteDialog(timer.id)"
         ></Timer>
@@ -98,6 +108,7 @@ export default {
     inputHour: "",
     inputMinutes: "",
     inputSecond: "",
+    inputTitle: "",
     addDialog: false,
     deleteDialog: false,
     deleteId: 0,
@@ -118,6 +129,7 @@ export default {
         const timer = {
           time: sum,
           id: this.timerIdSequence,
+          title: this.inputTitle,
         };
         this.timers.unshift(timer);
         this.timerIdSequence++;

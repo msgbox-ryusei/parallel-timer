@@ -3,6 +3,9 @@
     <div class="close-button">
       <span class="ma-1 cursor-button" @click="closeAction">×</span>
     </div>
+    <v-card-title class="pt-0 pb-2">
+      {{ title }}
+    </v-card-title>
     <v-card-text class="align-center">
       <div
         :class="{
@@ -29,6 +32,10 @@ export default {
     time: {
       required: true,
       type: Number,
+    },
+    title: {
+      default: "",
+      type: String,
     },
   },
   data() {
