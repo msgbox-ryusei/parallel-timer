@@ -1,5 +1,5 @@
 <template>
-  <v-card max-width="250">
+  <v-card width="211">
     <div class="close-button">
       <span class="ma-1 cursor-button" @click="closeAction">×</span>
     </div>
@@ -37,6 +37,10 @@ export default {
       default: "",
       type: String,
     },
+    sound: {
+      defalut: false,
+      type: Boolean,
+    },
   },
   data() {
     return {
@@ -45,7 +49,7 @@ export default {
       timeToAdd: 0,
       timerId: null,
       runningTimer: false,
-      alerm: new Audio("./alerm.mp3"),
+      alerm: new Audio("./alerm-sound.mp3"),
     };
   },
   computed: {
@@ -56,11 +60,8 @@ export default {
   },
   watch: {
     remainTime(newVal, preVal) {
-      if (newVal !== preVal && newVal === 0) {
-        // this.alerm.play();
-      }
-      if (newVal !== 0 && preVal === 0) {
-        // this.alerm.stop();
+      if (newVal !== preVal && newVal === 0 && this.sound) {
+        this.alerm.play();
       }
     },
   },

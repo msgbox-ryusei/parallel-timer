@@ -6,20 +6,35 @@
           <li @click="allStart"><a>All Start</a></li>
           <v-divider></v-divider>
           <li @click="allStop"><a>All Stop</a></li>
+          <v-divider></v-divider>
+          <li @click="allReset"><a>All Reset</a></li>
         </ul>
       </div>
       <div class="contant" id="top">
         <v-dialog v-model="addDialog" width="500" color>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="green lighten-1"
-              dark
-              v-bind="attrs"
-              v-on="on"
-              class="mx-3 mt-2"
-            >
-              Add Timer
-            </v-btn>
+            <v-row>
+              <v-col>
+                <v-btn
+                  color="green lighten-1"
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                  class="mx-3 mt-2"
+                >
+                  Add Timer
+                </v-btn>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col>
+                <v-switch
+                  v-model="playSound"
+                  label="Sound♪"
+                  color="info"
+                  hide-details
+                ></v-switch
+              ></v-col>
+            </v-row>
           </template>
 
           <v-card>
@@ -76,15 +91,18 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <Timer
-          v-for="timer of timers"
-          :key="timer.id"
-          class="ma-3"
-          :time="timer.time"
-          :title="timer.title"
-          ref="timers"
-          @close-action="openDeleteDialog(timer.id)"
-        ></Timer>
+        <div class="d-flex flex-wrap">
+          <Timer
+            v-for="timer of timers"
+            :key="timer.id"
+            class="ma-3"
+            :time="timer.time"
+            :title="timer.title"
+            ref="timers"
+            :sound="playSound"
+            @close-action="openDeleteDialog(timer.id)"
+          ></Timer>
+        </div>
       </div>
     </v-main>
   </v-app>
@@ -112,6 +130,7 @@ export default {
     addDialog: false,
     deleteDialog: false,
     deleteId: 0,
+    playSound: false,
   }),
   methods: {
     addTimer() {
@@ -154,6 +173,11 @@ export default {
       const stopActions = this.$refs.timers.map((ref) => ref.stopAction);
       Promise.all(stopActions.map((v) => v()));
     },
+    allReset() {
+      this.allStop();
+      const resetActions = this.$refs.timers.map((ref) => ref.resetAction);
+      Promise.all(resetActions.map((v) => v()));
+    },
   },
 };
 </script>
@@ -168,7 +192,7 @@ export default {
   position: fixed;
   top: 10vh;
   right: 0;
-  z-index: 1;
+  z-index: 100000;
   font-size: 0;
 }
 
